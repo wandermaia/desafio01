@@ -131,10 +131,8 @@ func BuscaCotacao() (*CotacaoDolar, error) {
 
 }
 
-// Função que grava os dados na contação no banco de dados SQLite
+// Função que grava os dados na tabela no banco de dados SQLite
 func GravaDados(dado *CotacaoDolar) error {
-
-	// Conectando ao banco de dados sqlite e realizando migrate
 	db, err := gorm.Open(sqlite.Open("cotacao.db"), &gorm.Config{})
 	if err != nil {
 		return err
@@ -145,7 +143,10 @@ func GravaDados(dado *CotacaoDolar) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
 
-	// Inserir a cotação no banco de dados utilizando o contexto configurado acima
-	db.WithContext(ctx).Create(&dado)
+	//Inserir a cotação no banco de dados utilizando o contexto configurado acima
+	if err := db.WithContext(ctx).Create(&dado).Error; err != nil {
+		return err
+	}
+
 	return nil
 }
